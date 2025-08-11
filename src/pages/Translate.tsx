@@ -25,8 +25,12 @@ const Translate = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const languages = [
+    { code: 'en', name: 'English 🇬🇧' },
+    { code: 'hi', name: 'Hindi 🇮🇳' },
     { code: 'es', name: 'Spanish 🇪🇸' },
     { code: 'fr', name: 'French 🇫🇷' },
+    { code: 'ta', name: 'Tamil 🇮🇳' },
+    { code: 'te', name: 'Telugu 🇮🇳' },
     { code: 'de', name: 'German 🇩🇪' },
     { code: 'it', name: 'Italian 🇮🇹' },
     { code: 'pt', name: 'Portuguese 🇵🇹' },
@@ -35,63 +39,42 @@ const Translate = () => {
     { code: 'ko', name: 'Korean 🇰🇷' },
     { code: 'zh', name: 'Chinese 🇨🇳' },
     { code: 'ar', name: 'Arabic 🇸🇦' },
-    { code: 'hi', name: 'Hindi 🇮🇳' },
-    { code: 'ta', name: 'Tamil 🇮🇳' },
-    { code: 'te', name: 'Telugu 🇮🇳' },
   ];
 
-  // Simple translation function (using a basic word replacement for demo)
+  // Real translation via LibreTranslate API with fallback mirrors
   const translateText = async (text: string, targetLang: string) => {
-    // This is a simplified translation for demonstration
-    // In a real application, you would use Google Translate API, LibreTranslate, or similar
-    const simpleTranslations: { [key: string]: { [key: string]: string } } = {
-      'es': {
-        'hello': 'hola',
-        'world': 'mundo',
-        'thank you': 'gracias',
-        'good morning': 'buenos días',
-        'good night': 'buenas noches',
-        'welcome': 'bienvenido',
-        'goodbye': 'adiós',
-        'please': 'por favor',
-        'yes': 'sí',
-        'no': 'no'
-      },
-      'fr': {
-        'hello': 'bonjour',
-        'world': 'monde',
-        'thank you': 'merci',
-        'good morning': 'bonjour',
-        'good night': 'bonne nuit',
-        'welcome': 'bienvenue',
-        'goodbye': 'au revoir',
-        'please': 's\'il vous plaît',
-        'yes': 'oui',
-        'no': 'non'
-      },
-      'hi': {
-        'hello': 'नमस्ते',
-        'world': 'दुनिया',
-        'thank you': 'धन्यवाद',
-        'good morning': 'सुप्रभात',
-        'good night': 'शुभ रात्रि',
-        'welcome': 'स्वागत',
-        'goodbye': 'अलविदा',
-        'please': 'कृपया',
-        'yes': 'हाँ',
-        'no': 'नहीं'
-      }
+    const endpoints = [
+      'https://libretranslate.com/translate',
+      'https://translate.astian.org/translate',
+      'https://translate.argosopentech.com/translate',
+    ];
+
+    const payload = {
+      q: text,
+      source: 'auto',
+      target: targetLang,
+      format: 'text',
     };
 
-    let result = text.toLowerCase();
-    const translations = simpleTranslations[targetLang] || {};
-    
-    Object.keys(translations).forEach(key => {
-      const regex = new RegExp(key, 'gi');
-      result = result.replace(regex, translations[key]);
-    });
-
-    return result || `[Translated to ${targetLang}] ${text}`;
+    let lastError: any = null;
+    for (const url of endpoints) {
+      try {
+        const res = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        const translated = data?.translatedText || data?.translation || '';
+        if (!translated) throw new Error('Empty translation');
+        return translated as string;
+      } catch (err) {
+        lastError = err;
+        continue;
+      }
+    }
+    throw lastError || new Error('Translation failed');
   };
 
   const handleTextTranslation = async () => {

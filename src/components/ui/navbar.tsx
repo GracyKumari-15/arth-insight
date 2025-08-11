@@ -29,11 +29,6 @@ const Navbar = ({ onLoginClick, onSignupClick, subscriptionMode, onSubscriptionT
         <h1 className="text-3xl font-cursive font-bold text-primary text-glow">
           Arth
         </h1>
-        <img 
-          src="/lovable-uploads/8b8c84f9-3842-43bc-b885-96ae7c2e70db.png" 
-          alt="Arth Logo" 
-          className="w-8 h-8 object-contain"
-        />
       </div>
 
       {/* Desktop Navigation */}
