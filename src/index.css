@@ -46,9 +46,9 @@ All colors MUST be HSL.
     --golden-border: 45 60% 75%;
 
     /* Gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(260 60% 70%), hsl(300 50% 75%));
-    --gradient-soft: linear-gradient(180deg, hsl(280 30% 97%), hsl(300 25% 95%));
-    --gradient-golden: linear-gradient(135deg, hsl(45 80% 85%), hsl(50 70% 90%));
+    --gradient-primary: linear-gradient(135deg, hsl(260 60% 72%), hsl(300 50% 78%));
+    --gradient-soft: linear-gradient(180deg, hsl(280 30% 99%), hsl(300 25% 98%));
+    --gradient-golden: linear-gradient(135deg, hsl(45 85% 92%), hsl(50 80% 95%));
 
     /* Shadows */
     --shadow-soft: 0 10px 30px -5px hsl(260 60% 60% / 0.15);
@@ -143,10 +143,6 @@ All colors MUST be HSL.
   /* Golden subscription mode */
   .golden-mode {
     background: var(--gradient-golden) !important;
-    --background: var(--golden-background);
-    --primary: var(--golden-primary);
-    --accent: var(--golden-accent);
-    --border: var(--golden-border);
   }
 
   /* Floating background elements */

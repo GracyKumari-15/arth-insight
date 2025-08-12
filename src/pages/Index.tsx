@@ -47,7 +47,7 @@ const Index = () => {
       <main className="container mx-auto px-4 py-8">
         {/* Welcome Section */}
         <section className="text-center mb-16">
-          <h1 className="inline-block mx-auto text-5xl md:text-6xl font-cursive font-bold text-primary mb-6 relative underline-animate text-glow">
+          <h1 className="inline-block mx-auto text-4xl md:text-5xl font-cursive font-bold text-primary mb-6 relative underline-animate text-glow">
             Welcome!!!
           </h1>
           <p className="text-lg md:text-xl font-times text-muted-foreground max-w-4xl mx-auto leading-relaxed">
@@ -58,7 +58,7 @@ const Index = () => {
         {/* Tools Section */}
         <section className="mb-16">
           <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-cursive font-bold text-primary mb-4 text-glow">
+            <h2 className="text-2xl md:text-3xl font-cursive font-bold text-primary mb-4 text-glow">
               Powerful Text Processing Tools 🚀
             </h2>
             <p className="text-lg font-times text-muted-foreground max-w-4xl mx-auto leading-relaxed">

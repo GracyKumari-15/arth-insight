@@ -25,7 +25,6 @@ const Navbar = ({ onLoginClick, onSignupClick, subscriptionMode, onSubscriptionT
     <nav className="w-full px-6 py-4 flex items-center justify-between relative z-50">
       {/* Logo */}
       <div className="flex items-center gap-3">
-        <span className="text-2xl">📚</span>
         <h1 className="text-3xl font-cursive font-bold text-primary text-glow">
           Arth
         </h1>
