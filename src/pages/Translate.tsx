@@ -41,40 +41,43 @@ const Translate = () => {
     { code: 'ar', name: 'Arabic 🇸🇦' },
   ];
 
-  // Real translation via LibreTranslate API with fallback mirrors
+  // Translation using MyMemory API (free and reliable)
   const translateText = async (text: string, targetLang: string) => {
-    const endpoints = [
-      'https://libretranslate.com/translate',
-      'https://translate.astian.org/translate',
-      'https://translate.argosopentech.com/translate',
-    ];
-
-    const payload = {
-      q: text,
-      source: 'auto',
-      target: targetLang,
-      format: 'text',
-    };
-
-    let lastError: any = null;
-    for (const url of endpoints) {
-      try {
-        const res = await fetch(url, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload),
-        });
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const data = await res.json();
-        const translated = data?.translatedText || data?.translation || '';
-        if (!translated) throw new Error('Empty translation');
-        return translated as string;
-      } catch (err) {
-        lastError = err;
-        continue;
+    try {
+      // MyMemory API - free translation service
+      const encodedText = encodeURIComponent(text);
+      const url = `https://api.mymemory.translated.net/get?q=${encodedText}&langpair=auto|${targetLang}`;
+      
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
       }
+      
+      const data = await response.json();
+      
+      if (data.responseStatus === 200 && data.responseData?.translatedText) {
+        return data.responseData.translatedText;
+      }
+      
+      // Fallback: Simple client-side translation mapping for basic words
+      const basicTranslations: Record<string, Record<string, string>> = {
+        'hello': { 'es': 'hola', 'fr': 'bonjour', 'hi': 'नमस्ते', 'de': 'hallo', 'it': 'ciao' },
+        'goodbye': { 'es': 'adiós', 'fr': 'au revoir', 'hi': 'अलविदा', 'de': 'auf wiedersehen', 'it': 'arrivederci' },
+        'thank you': { 'es': 'gracias', 'fr': 'merci', 'hi': 'धन्यवाद', 'de': 'danke', 'it': 'grazie' },
+        'yes': { 'es': 'sí', 'fr': 'oui', 'hi': 'हाँ', 'de': 'ja', 'it': 'sì' },
+        'no': { 'es': 'no', 'fr': 'non', 'hi': 'नहीं', 'de': 'nein', 'it': 'no' }
+      };
+      
+      const lowerText = text.toLowerCase();
+      if (basicTranslations[lowerText] && basicTranslations[lowerText][targetLang]) {
+        return basicTranslations[lowerText][targetLang];
+      }
+      
+      throw new Error('Translation service unavailable');
+    } catch (error) {
+      console.error('Translation error:', error);
+      throw new Error('Unable to translate text. Please check your internet connection and try again.');
     }
-    throw lastError || new Error('Translation failed');
   };
 
   const handleTextTranslation = async () => {
