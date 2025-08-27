@@ -31,7 +31,14 @@ const LiveSmartVision = () => {
 
   const startCamera = async () => {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio: false });
+      const stream = await navigator.mediaDevices.getUserMedia({ 
+        video: { 
+          facingMode: { ideal: 'environment' }, 
+          width: { ideal: 1280 },
+          height: { ideal: 720 }
+        }, 
+        audio: false 
+      });
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
         await videoRef.current.play();
@@ -197,18 +204,18 @@ const LiveSmartVision = () => {
   useEffect(() => () => stopCamera(), []);
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
       {/* Left: Live video with overlay */}
-      <Card className="p-4">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-semibold">🎥 Live SmartVision: Object Detection & Labeling</h2>
+      <Card className="p-3 md:p-4">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 gap-2">
+          <h2 className="text-lg md:text-xl font-semibold text-black">🎥 Live SmartVision</h2>
           <div className="flex gap-2">
             {!running ? (
-              <Button onClick={startCamera} disabled={loadingModel} className="bg-gradient-primary">
-                {loadingModel ? 'Loading model…' : '▶️ Start Camera'}
+              <Button onClick={startCamera} disabled={loadingModel} className="bg-gradient-primary text-sm md:text-base">
+                {loadingModel ? 'Loading...' : '▶️ Start'}
               </Button>
             ) : (
-              <Button variant="destructive" onClick={stopCamera}>⏹️ Stop</Button>
+              <Button variant="destructive" onClick={stopCamera} className="text-sm md:text-base">⏹️ Stop</Button>
             )}
           </div>
         </div>
@@ -226,8 +233,8 @@ const LiveSmartVision = () => {
 
       {/* Right: Panels */}
       <div className="space-y-6">
-        <Card className="p-4">
-          <h3 className="text-lg font-semibold mb-2">🔍 Detected Objects</h3>
+        <Card className="p-3 md:p-4">
+          <h3 className="text-base md:text-lg font-semibold mb-2 text-black">🔍 Detected Objects</h3>
           <div className="space-y-2 max-h-64 overflow-auto">
             {detections.length === 0 ? (
               <p className="text-muted-foreground">No objects detected yet…</p>
@@ -245,21 +252,28 @@ const LiveSmartVision = () => {
           </div>
         </Card>
 
-        <Card className="p-4">
-          <h3 className="text-lg font-semibold mb-2">📝 OCR Results</h3>
+        <Card className="p-3 md:p-4">
+          <h3 className="text-base md:text-lg font-semibold mb-2 text-black">📝 OCR Results</h3>
           <div className="min-h-16 p-3 bg-muted rounded-md">
             {ocrText ? <span className="font-medium">{ocrText}</span> : <span className="text-muted-foreground">No readable text found</span>}
           </div>
         </Card>
 
-        <Card className="p-4">
-          <h3 className="text-lg font-semibold mb-3">🔊 TTS Output</h3>
-          <div className="flex gap-2">
-            <Button onClick={() => setSpeechOn((s) => !s)} className={speechOn ? 'bg-primary' : 'bg-gradient-primary'}>
-              {speechOn ? <><VolumeX className="mr-2 h-4 w-4" /> Speech OFF</> : <><Volume2 className="mr-2 h-4 w-4" /> Speech ON</>}
+        <Card className="p-3 md:p-4">
+          <h3 className="text-base md:text-lg font-semibold mb-3 text-black">🔊 TTS Output</h3>
+          <div className="flex flex-col sm:flex-row gap-2">
+            <Button 
+              onClick={() => setSpeechOn((s) => !s)} 
+              className={`${speechOn ? 'bg-primary' : 'bg-gradient-primary'} text-sm md:text-base flex-1 sm:flex-none`}
+            >
+              {speechOn ? <><VolumeX className="mr-1 md:mr-2 h-4 w-4" /> OFF</> : <><Volume2 className="mr-1 md:mr-2 h-4 w-4" /> ON</>}
             </Button>
-            <Button variant="outline" onClick={() => toast({ title: 'Download requires TTS service', description: 'Use ElevenLabs or a backend to generate MP3.' })}>
-              <Download className="mr-2 h-4 w-4" /> Download MP3
+            <Button 
+              variant="outline" 
+              onClick={() => toast({ title: 'Download requires TTS service', description: 'Use ElevenLabs or a backend to generate MP3.' })}
+              className="text-sm md:text-base flex-1 sm:flex-none"
+            >
+              <Download className="mr-1 md:mr-2 h-4 w-4" /> Download
             </Button>
           </div>
         </Card>

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Button } from './button';
 import { Menu, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import arthLogo from '@/assets/arth-logo.png';
 
 interface NavbarProps {
   onLoginClick: () => void;
@@ -25,7 +26,8 @@ const Navbar = ({ onLoginClick, onSignupClick, subscriptionMode, onSubscriptionT
     <nav className="w-full px-6 py-4 flex items-center justify-between relative z-50">
       {/* Logo */}
       <div className="flex items-center gap-3">
-        <h1 className="text-3xl font-cursive font-bold text-primary text-glow">
+        <img src={arthLogo} alt="Arth Logo" className="w-8 h-8 md:w-10 md:h-10" />
+        <h1 className="text-2xl md:text-3xl font-cursive font-bold text-black">
           Arth
         </h1>
       </div>

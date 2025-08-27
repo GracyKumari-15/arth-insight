@@ -46,22 +46,22 @@ const Index = () => {
 
       <main className="container mx-auto px-4 py-8">
         {/* Welcome Section */}
-        <section className="text-center mb-16">
-          <h1 className="inline-block mx-auto text-4xl md:text-5xl font-cursive font-bold text-primary mb-6 relative underline-animate text-glow">
+        <section className="text-center mb-12 md:mb-16">
+          <h1 className="inline-block mx-auto text-3xl md:text-4xl lg:text-5xl font-cursive font-bold text-black mb-4 md:mb-6 relative underline-animate">
             Welcome!!!
           </h1>
-          <p className="text-lg md:text-xl font-times text-muted-foreground max-w-4xl mx-auto leading-relaxed">
+          <p className="text-base md:text-lg lg:text-xl font-times text-muted-foreground max-w-4xl mx-auto leading-relaxed px-4">
             "Transform your text processing experience with our intelligent suite of tools. From OCR to AI-powered analysis, we make text understanding effortless."
           </p>
         </section>
 
         {/* Tools Section */}
         <section className="mb-16">
-          <div className="text-center mb-12">
-            <h2 className="text-2xl md:text-3xl font-cursive font-bold text-primary mb-4 text-glow">
+          <div className="text-center mb-8 md:mb-12">
+            <h2 className="text-xl md:text-2xl lg:text-3xl font-cursive font-bold text-black mb-3 md:mb-4">
               Powerful Text Processing Tools 🚀
             </h2>
-            <p className="text-lg font-times text-muted-foreground max-w-4xl mx-auto leading-relaxed">
+            <p className="text-base md:text-lg font-times text-muted-foreground max-w-4xl mx-auto leading-relaxed px-4">
               "Discover our comprehensive suite of AI-powered tools designed to extract, analyze, and transform text in ways you never imagined. Each tool is crafted with precision to deliver exceptional results."
             </p>
           </div>
@@ -95,7 +95,7 @@ const Index = () => {
         {/* Features Preview */}
         <section className="text-center">
           <div className="bg-card rounded-2xl p-8 shadow-soft border max-w-4xl mx-auto">
-            <h3 className="text-2xl font-semibold text-foreground mb-4">
+            <h3 className="text-xl md:text-2xl font-semibold text-black mb-4">
               Experience the Future of Text Processing
             </h3>
             <p className="text-muted-foreground mb-6">
