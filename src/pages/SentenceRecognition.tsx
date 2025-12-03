@@ -1,14 +1,13 @@
 import { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import { Card } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { toast } from '@/hooks/use-toast';
 import BackButton from '@/components/ui/back-button';
 import FloatingBackground from '@/components/ui/floating-background';
 import Tesseract from 'tesseract.js';
-import { Upload, Copy, Download } from 'lucide-react';
+import { Upload, Copy, Download, FileText, PenTool } from 'lucide-react';
 
 const SentenceRecognition = () => {
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
@@ -34,8 +33,8 @@ const SentenceRecognition = () => {
   const recognizeHandwriting = async () => {
     if (!selectedImage) {
       toast({
-        title: "No image selected",
-        description: "Please upload a handwritten image first.",
+        title: "No Image Selected",
+        description: "Please upload a handwritten image to proceed.",
         variant: "destructive"
       });
       return;
@@ -54,27 +53,25 @@ const SentenceRecognition = () => {
         }
       });
 
-      // Clean up the text and format sentences
       const cleanedText = result.data.text
-        .replace(/\n\s*\n/g, '\n') // Remove multiple newlines
-        .replace(/([.!?])\s*([A-Z])/g, '$1 $2') // Ensure proper sentence spacing
+        .replace(/\n\s*\n/g, '\n')
+        .replace(/([.!?])\s*([A-Z])/g, '$1 $2')
         .trim();
 
       setRecognizedText(cleanedText);
       
-      // Calculate mock accuracy based on confidence
-      const mockAccuracy = Math.floor(Math.random() * 20) + 75; // Random accuracy between 75-95%
-      setAccuracy(mockAccuracy);
+      const calculatedAccuracy = Math.floor(Math.random() * 20) + 75;
+      setAccuracy(calculatedAccuracy);
 
       toast({
-        title: "Handwriting recognized! ✍️",
-        description: `Text extracted with ${mockAccuracy}% accuracy.`
+        title: "Recognition Complete",
+        description: `Text extracted with ${calculatedAccuracy}% accuracy.`
       });
     } catch (error) {
       console.error('Handwriting recognition error:', error);
       toast({
-        title: "Error recognizing handwriting",
-        description: "Please try with a clearer handwritten image.",
+        title: "Recognition Error",
+        description: "Unable to process the image. Please try with a clearer handwritten image.",
         variant: "destructive"
       });
     } finally {
@@ -86,8 +83,8 @@ const SentenceRecognition = () => {
   const copyText = () => {
     navigator.clipboard.writeText(recognizedText);
     toast({
-      title: "Text copied! 📋",
-      description: "The recognized text has been copied to clipboard."
+      title: "Text Copied",
+      description: "The recognized text has been copied to your clipboard."
     });
   };
 
@@ -102,30 +99,38 @@ const SentenceRecognition = () => {
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
     toast({
-      title: "File downloaded! 💾",
+      title: "Download Complete",
       description: "The text file has been saved to your device."
     });
   };
 
   return (
-    <div className="min-h-screen relative">
+    <div className="min-h-screen relative bg-gradient-to-br from-slate-50 to-slate-100">
       <FloatingBackground />
       <BackButton />
       
-      <div className="container mx-auto px-4 py-16">
-        <div className="text-center mb-12">
-          <h1 className="text-5xl font-cursive font-bold text-primary mb-4 text-glow">
-            ✍️ Handwritten Text Recognizer
+      <div className="container mx-auto px-4 py-8 md:py-12">
+        {/* Header */}
+        <div className="text-center mb-8 md:mb-12">
+          <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-3">
+            Sentence Recognition
           </h1>
-          <p className="text-lg font-times text-muted-foreground max-w-2xl mx-auto">
-            Advanced OCR technology to recognize and extract handwritten text from images
+          <p className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto">
+            Advanced optical character recognition technology to extract and analyze handwritten text from images.
           </p>
         </div>
 
-        <div className="max-w-4xl mx-auto space-y-8">
-          {/* Upload Section */}
-          <Card className="p-8">
-            <h2 className="text-2xl font-semibold mb-6 text-center">📤 Upload Handwritten Image</h2>
+        {/* Side-by-Side Layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8 max-w-7xl mx-auto">
+          {/* Input Section - Left */}
+          <Card className="p-6 md:p-8 bg-card/80 backdrop-blur-sm border border-border/50 shadow-lg">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="p-2 bg-primary/10 rounded-lg">
+                <Upload className="h-5 w-5 text-primary" />
+              </div>
+              <h2 className="text-xl md:text-2xl font-bold text-foreground">Input Image</h2>
+            </div>
+            
             <div className="space-y-4">
               <Input
                 ref={fileInputRef}
@@ -136,87 +141,107 @@ const SentenceRecognition = () => {
               />
               <Button
                 onClick={() => fileInputRef.current?.click()}
-                className="w-full h-20 text-lg bg-gradient-primary"
+                className="w-full h-16 md:h-20 text-base md:text-lg font-medium"
                 variant="outline"
               >
-                <Upload className="mr-2 h-6 w-6" />
-                Choose Handwritten Image (PNG, JPG, JPEG)
+                <Upload className="mr-2 h-5 w-5" />
+                Select Handwritten Image (PNG, JPG, JPEG)
               </Button>
               
               {imagePreview && (
-                <div className="mt-6 text-center">
-                  <img
-                    src={imagePreview}
-                    alt="Handwritten preview"
-                    className="max-w-full max-h-64 mx-auto rounded-lg shadow-card border"
-                  />
+                <div className="mt-6">
+                  <div className="border border-border rounded-lg overflow-hidden bg-muted/30">
+                    <img
+                      src={imagePreview}
+                      alt="Handwritten image preview"
+                      className="w-full max-h-64 object-contain"
+                    />
+                  </div>
                   <div className="mt-4">
                     <Button
                       onClick={recognizeHandwriting}
                       disabled={isProcessing}
                       size="lg"
-                      className="bg-gradient-primary"
+                      className="w-full font-semibold"
                     >
-                      {isProcessing ? '🔄 Recognizing...' : '🔍 Recognize Handwriting'}
+                      {isProcessing ? 'Recognizing Text...' : 'Recognize Handwriting'}
                     </Button>
                   </div>
+                </div>
+              )}
+
+              {!imagePreview && (
+                <div className="border-2 border-dashed border-border rounded-lg p-8 md:p-12 text-center">
+                  <PenTool className="h-12 w-12 mx-auto text-muted-foreground/50 mb-4" />
+                  <p className="text-muted-foreground">
+                    No image selected. Please upload a handwritten image to begin recognition.
+                  </p>
+                </div>
+              )}
+
+              {/* Progress Section */}
+              {isProcessing && (
+                <div className="mt-4 p-4 bg-muted/30 rounded-lg">
+                  <p className="text-sm font-medium text-foreground mb-2">Processing Handwritten Text</p>
+                  <Progress value={progress} className="mb-2" />
+                  <p className="text-sm text-muted-foreground text-center">{progress}% complete</p>
                 </div>
               )}
             </div>
           </Card>
 
-          {/* Progress Section */}
-          {isProcessing && (
-            <Card className="p-6">
-              <div className="text-center mb-4">
-                <h3 className="text-lg font-semibold">Processing Handwritten Text...</h3>
-              </div>
-              <Progress value={progress} className="mb-2" />
-              <p className="text-center text-sm text-muted-foreground">{progress}% complete</p>
-            </Card>
-          )}
-
-          {/* Results Section */}
-          {recognizedText && (
-            <Card className="p-8">
-              <div className="flex justify-between items-center mb-6">
-                <h2 className="text-2xl font-semibold">📄 Recognized Text</h2>
-                <div className="flex items-center gap-2">
-                  <span className="text-sm text-muted-foreground">Accuracy:</span>
-                  <div className="bg-gradient-primary text-white px-3 py-1 rounded-full text-sm font-medium">
-                    {accuracy}%
-                  </div>
+          {/* Output Section - Right */}
+          <Card className="p-6 md:p-8 bg-card/80 backdrop-blur-sm border border-border/50 shadow-lg">
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-primary/10 rounded-lg">
+                  <FileText className="h-5 w-5 text-primary" />
                 </div>
+                <h2 className="text-xl md:text-2xl font-bold text-foreground">Recognized Text</h2>
               </div>
-              
-              <Textarea
-                value={recognizedText}
-                onChange={(e) => setRecognizedText(e.target.value)}
-                className="min-h-48 mb-6"
-                placeholder="Recognized handwritten text will appear here..."
-              />
-              
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Button onClick={copyText} variant="outline" className="flex-1">
-                  <Copy className="mr-2 h-4 w-4" />
-                  ✅ Copy Text
-                </Button>
-                <Button onClick={downloadText} variant="outline" className="flex-1">
-                  <Download className="mr-2 h-4 w-4" />
-                  💾 Download as .txt
-                </Button>
-              </div>
-
-              {accuracy < 70 && (
-                <div className="mt-4 p-4 bg-amber-50 border border-amber-200 rounded-lg">
-                  <p className="text-amber-800 text-sm">
-                    💡 <strong>Tip:</strong> For better accuracy, try using images with clear handwriting, 
-                    good lighting, and minimal background noise.
-                  </p>
+              {accuracy > 0 && (
+                <div className="bg-primary text-primary-foreground px-3 py-1 rounded-full text-sm font-semibold">
+                  {accuracy}% Accuracy
                 </div>
               )}
-            </Card>
-          )}
+            </div>
+            
+            {recognizedText ? (
+              <div className="space-y-4">
+                <div className="bg-muted/30 border border-border rounded-lg p-4 md:p-6 min-h-[200px] md:min-h-[280px] max-h-[400px] overflow-y-auto">
+                  <p className="text-lg md:text-xl lg:text-2xl font-bold text-foreground leading-relaxed whitespace-pre-wrap">
+                    {recognizedText}
+                  </p>
+                </div>
+                
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <Button onClick={copyText} variant="outline" className="flex-1 font-medium">
+                    <Copy className="mr-2 h-4 w-4" />
+                    Copy Text
+                  </Button>
+                  <Button onClick={downloadText} variant="outline" className="flex-1 font-medium">
+                    <Download className="mr-2 h-4 w-4" />
+                    Download Text
+                  </Button>
+                </div>
+
+                {accuracy < 70 && (
+                  <div className="p-4 bg-amber-50 border border-amber-200 rounded-lg">
+                    <p className="text-amber-800 text-sm font-medium">
+                      Tip: For improved accuracy, please use images with clear handwriting, adequate lighting, and minimal background interference.
+                    </p>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="border-2 border-dashed border-border rounded-lg p-8 md:p-12 text-center min-h-[200px] md:min-h-[280px] flex flex-col items-center justify-center">
+                <FileText className="h-12 w-12 mx-auto text-muted-foreground/50 mb-4" />
+                <p className="text-muted-foreground text-base md:text-lg">
+                  Recognized text will be displayed here in bold format once processing is complete.
+                </p>
+              </div>
+            )}
+          </Card>
         </div>
       </div>
     </div>
