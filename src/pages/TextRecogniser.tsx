@@ -1,13 +1,12 @@
 import { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import { Card } from '@/components/ui/card';
 import { toast } from '@/hooks/use-toast';
 import BackButton from '@/components/ui/back-button';
 import FloatingBackground from '@/components/ui/floating-background';
 import Tesseract from 'tesseract.js';
-import { Download, Copy, Upload } from 'lucide-react';
+import { Download, Copy, Upload, FileText } from 'lucide-react';
 
 const TextRecogniser = () => {
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
@@ -31,8 +30,8 @@ const TextRecogniser = () => {
   const extractText = async () => {
     if (!selectedImage) {
       toast({
-        title: "No image selected",
-        description: "Please upload an image first.",
+        title: "No Image Selected",
+        description: "Please upload an image to proceed with text extraction.",
         variant: "destructive"
       });
       return;
@@ -45,14 +44,14 @@ const TextRecogniser = () => {
       });
       setExtractedText(result.data.text);
       toast({
-        title: "Text extracted successfully! 🎉",
-        description: "Your image has been processed."
+        title: "Text Extraction Complete",
+        description: "The text has been successfully extracted from your image."
       });
     } catch (error) {
       console.error('OCR Error:', error);
       toast({
-        title: "Error processing image",
-        description: "Please try again with a clearer image.",
+        title: "Processing Error",
+        description: "Unable to process the image. Please try with a clearer image.",
         variant: "destructive"
       });
     } finally {
@@ -63,8 +62,8 @@ const TextRecogniser = () => {
   const copyText = () => {
     navigator.clipboard.writeText(extractedText);
     toast({
-      title: "Text copied! 📋",
-      description: "The extracted text has been copied to clipboard."
+      title: "Text Copied",
+      description: "The extracted text has been copied to your clipboard."
     });
   };
 
@@ -79,30 +78,38 @@ const TextRecogniser = () => {
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
     toast({
-      title: "File downloaded! 💾",
+      title: "Download Complete",
       description: "The text file has been saved to your device."
     });
   };
 
   return (
-    <div className="min-h-screen relative">
+    <div className="min-h-screen relative bg-gradient-to-br from-slate-50 to-slate-100">
       <FloatingBackground />
       <BackButton />
       
-      <div className="container mx-auto px-4 py-16">
-        <div className="text-center mb-12">
-          <h1 className="text-5xl font-cursive font-bold text-primary mb-4 text-glow">
-            🔍 Text Recogniser
+      <div className="container mx-auto px-4 py-8 md:py-12">
+        {/* Header */}
+        <div className="text-center mb-8 md:mb-12">
+          <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-3">
+            Text Recogniser
           </h1>
-          <p className="text-lg font-times text-muted-foreground max-w-2xl mx-auto">
-            Upload an image and extract text using advanced OCR technology
+          <p className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto">
+            Upload an image containing text and extract its content using advanced optical character recognition technology.
           </p>
         </div>
 
-        <div className="max-w-4xl mx-auto space-y-8">
-          {/* Upload Section */}
-          <Card className="p-8">
-            <h2 className="text-2xl font-semibold mb-6 text-center">📸 Upload Image</h2>
+        {/* Side-by-Side Layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8 max-w-7xl mx-auto">
+          {/* Input Section - Left */}
+          <Card className="p-6 md:p-8 bg-card/80 backdrop-blur-sm border border-border/50 shadow-lg">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="p-2 bg-primary/10 rounded-lg">
+                <Upload className="h-5 w-5 text-primary" />
+              </div>
+              <h2 className="text-xl md:text-2xl font-bold text-foreground">Input Image</h2>
+            </div>
+            
             <div className="space-y-4">
               <Input
                 ref={fileInputRef}
@@ -113,62 +120,83 @@ const TextRecogniser = () => {
               />
               <Button
                 onClick={() => fileInputRef.current?.click()}
-                className="w-full h-20 text-lg bg-gradient-primary"
+                className="w-full h-16 md:h-20 text-base md:text-lg font-medium"
                 variant="outline"
               >
-                <Upload className="mr-2 h-6 w-6" />
-                Choose Image (JPG, PNG, JPEG)
+                <Upload className="mr-2 h-5 w-5" />
+                Select Image File (JPG, PNG, JPEG)
               </Button>
               
               {imagePreview && (
-                <div className="mt-6 text-center">
-                  <img
-                    src={imagePreview}
-                    alt="Preview"
-                    className="max-w-full max-h-64 mx-auto rounded-lg shadow-card"
-                  />
+                <div className="mt-6">
+                  <div className="border border-border rounded-lg overflow-hidden bg-muted/30">
+                    <img
+                      src={imagePreview}
+                      alt="Uploaded image preview"
+                      className="w-full max-h-64 object-contain"
+                    />
+                  </div>
+                  <div className="mt-4">
+                    <Button
+                      onClick={extractText}
+                      disabled={isProcessing}
+                      size="lg"
+                      className="w-full font-semibold"
+                    >
+                      {isProcessing ? 'Processing Image...' : 'Extract Text'}
+                    </Button>
+                  </div>
+                </div>
+              )}
+
+              {!imagePreview && (
+                <div className="border-2 border-dashed border-border rounded-lg p-8 md:p-12 text-center">
+                  <FileText className="h-12 w-12 mx-auto text-muted-foreground/50 mb-4" />
+                  <p className="text-muted-foreground">
+                    No image selected. Please upload an image to begin text extraction.
+                  </p>
                 </div>
               )}
             </div>
           </Card>
 
-          {/* Extract Button */}
-          {selectedImage && (
-            <div className="text-center">
-              <Button
-                onClick={extractText}
-                disabled={isProcessing}
-                size="lg"
-                className="bg-gradient-primary text-lg px-12"
-              >
-                {isProcessing ? '🔄 Processing...' : '🔍 Extract Text'}
-              </Button>
-            </div>
-          )}
-
-          {/* Results Section */}
-          {extractedText && (
-            <Card className="p-8">
-              <h2 className="text-2xl font-semibold mb-6 text-center">📄 Extracted Text</h2>
-              <Textarea
-                value={extractedText}
-                onChange={(e) => setExtractedText(e.target.value)}
-                className="min-h-48 mb-6"
-                placeholder="Extracted text will appear here..."
-              />
-              
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Button onClick={copyText} variant="outline" className="flex-1">
-                  <Copy className="mr-2 h-4 w-4" />
-                  📝 Copy Text
-                </Button>
-                <Button onClick={downloadText} variant="outline" className="flex-1">
-                  <Download className="mr-2 h-4 w-4" />
-                  💾 Download Text
-                </Button>
+          {/* Output Section - Right */}
+          <Card className="p-6 md:p-8 bg-card/80 backdrop-blur-sm border border-border/50 shadow-lg">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="p-2 bg-primary/10 rounded-lg">
+                <FileText className="h-5 w-5 text-primary" />
               </div>
-            </Card>
-          )}
+              <h2 className="text-xl md:text-2xl font-bold text-foreground">Extracted Text</h2>
+            </div>
+            
+            {extractedText ? (
+              <div className="space-y-4">
+                <div className="bg-muted/30 border border-border rounded-lg p-4 md:p-6 min-h-[200px] md:min-h-[280px] max-h-[400px] overflow-y-auto">
+                  <p className="text-lg md:text-xl lg:text-2xl font-bold text-foreground leading-relaxed whitespace-pre-wrap">
+                    {extractedText}
+                  </p>
+                </div>
+                
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <Button onClick={copyText} variant="outline" className="flex-1 font-medium">
+                    <Copy className="mr-2 h-4 w-4" />
+                    Copy Text
+                  </Button>
+                  <Button onClick={downloadText} variant="outline" className="flex-1 font-medium">
+                    <Download className="mr-2 h-4 w-4" />
+                    Download Text
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              <div className="border-2 border-dashed border-border rounded-lg p-8 md:p-12 text-center min-h-[200px] md:min-h-[280px] flex flex-col items-center justify-center">
+                <FileText className="h-12 w-12 mx-auto text-muted-foreground/50 mb-4" />
+                <p className="text-muted-foreground text-base md:text-lg">
+                  Extracted text will be displayed here in bold format once processing is complete.
+                </p>
+              </div>
+            )}
+          </Card>
         </div>
       </div>
     </div>
